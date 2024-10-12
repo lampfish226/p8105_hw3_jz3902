@@ -1,0 +1,22 @@
+---
+title: "p8105_hw3_jz3902"
+author: "Jinghan Zhao"
+date: "2024-10-11"
+output: github_document
+---
+
+```{r setup, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
+
+## Problem 1
+
+
+
+
+## Problem 2
+
+
+
+## Problem 3
+
