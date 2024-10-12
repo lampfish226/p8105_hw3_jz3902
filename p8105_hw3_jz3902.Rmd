@@ -11,7 +11,58 @@ library(tidyverse)
 
 ## Problem 1
 
+### Short description
 
+```{r import_noaa}
+library(p8105.datasets)
+data("ny_noaa")
+
+ny_noaa
+```
+
+There are `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns in the dataset.
+
+```{r missing_noaa}
+colMeans(is.na(ny_noaa))
+```
+
+We have missing values in `prcp`, `snow`, `snwd`, `tmax` and `tmin` columns. Especially, there over 40% data is missing in `tmax` and `tmin`, which is a rather huge proportion. 
+
+This issue may result in a large amount of observations being ignored during data analysis, making the analysis results incomplete and unable to reflect the true situation.
+
+
+### Data cleaning
+
+```{r data_cleaning_noaa}
+ny_noaa_clean = 
+  ny_noaa %>% 
+  mutate(
+    tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin),
+    year = lubridate::year(date),
+    month = lubridate::month(date),
+    day = lubridate::day(date),
+    prcp = prcp / 10,
+    tmax = tmax / 10,
+    tmin = tmin / 10
+  ) %>% 
+  relocate(id, date, year, month, day)
+
+ny_noaa_clean %>% 
+  count(snow) %>% 
+  arrange(desc(n)) %>% 
+  head()
+```
+
+a) Data cleaning steps:
+
+* Create variables: `year`, `month` and `day`
+
+* Arrange the units of variables: `prcp`(mm), `snow`(mm), `snwd`(mm), `tmax`(degrees C), `tmin`(degrees C)
+
+* Organize variables in a meaningful order
+
+b) For snowfall, the most commonly observed values is 0. Because the dataset covers the whole year, but snow is usually only possible in winter, most observations do not have snow.
 
 
 ## Problem 2
