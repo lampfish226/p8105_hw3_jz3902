@@ -7,6 +7,8 @@ output: github_document
 
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
+library(patchwork)
+knitr::opts_chunk$set(fig.width=10, fig.height=5)
 ```
 
 ## Problem 1
@@ -62,7 +64,81 @@ a) Data cleaning steps:
 
 * Organize variables in a meaningful order
 
-b) For snowfall, the most commonly observed values is 0. Because the dataset covers the whole year, but snow is usually only possible in winter, most observations do not have snow.
+b) For snowfall, the most commonly observed values is 0. Because the dataset covers the whole year, but snow usually occurs in winter, most observations do not have snow.
+
+
+### Average tmax in Jan and Jul
+
+```{r avg_tmax, message = FALSE}
+month.labs = c("January", "July")
+names(month.labs) = c(1, 7)
+
+ny_noaa_clean %>% 
+  filter(month == c(1, 7)) %>%
+  group_by(id, month) %>% 
+  summarize(avg_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  drop_na(avg_tmax) %>% 
+  ggplot(aes(x = id, y = avg_tmax, color = month)) +
+  geom_point() +
+  facet_grid(. ~ month, 
+             labeller = labeller(month = month.labs)) +
+  labs(
+    title = "Average Maximum Temperature",
+    x = "Station",
+    y = "Average Max Temp (°C)",
+    color = "Month") +
+  theme_minimal() +
+  theme(axis.text.x = element_blank())
+```
+
+* The average maximum temperature in January fluctuates around 0 degrees C; the average maximum temperature in July is mostly between 25-30 degrees C.
+
+* There are some outliers in January. To find out which stations they are:
+
+```{r avg_tmax_outlier}
+ny_noaa_clean %>% 
+  filter(month == c(1)) %>%
+  group_by(id, month) %>% 
+  summarize(avg_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  drop_na(avg_tmax) %>% 
+  arrange(avg_tmax) %>% 
+  head()
+```
+
+* Station USC00305925, USC00301723 and USC00302720 have extreme low average temperatures in January.
+
+
+### tmax vs tmin + snowfall
+
+```{r tmax_tmin_snowfall}
+ggp_tmax_tmin = 
+  ny_noaa_clean %>% 
+  drop_na(tmin, tmax) %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  labs(
+    title = "Hexbin Plot: tmax vs tmin",
+    x = "Minimum Temperature (°C)",
+    y = "Maximum Temperature (°C)")
+
+ggp_snowfall = 
+  ny_noaa_clean %>% 
+  select(year, snow) %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  ggplot(aes(x = factor(year), y = snow)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Distribution of Snowfall",
+       x = "Year",
+       y = "Snowfall (mm)",
+       caption = "Snowfall values greater than 0 and less than 100") +
+  theme(axis.text.x = element_text(size = 6,
+                                   angle = 45, 
+                                   hjust = 1))
+
+ggp_tmax_tmin + ggp_snowfall
+```
+
+
 
 
 ## Problem 2
