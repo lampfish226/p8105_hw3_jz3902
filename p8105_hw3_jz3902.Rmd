@@ -119,7 +119,10 @@ ggp_tmax_tmin =
   labs(
     title = "Hexbin Plot: tmax vs tmin",
     x = "Minimum Temperature (°C)",
-    y = "Maximum Temperature (°C)")
+    y = "Maximum Temperature (°C)") +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 8, angle = 45))
+  
 
 ggp_snowfall = 
   ny_noaa_clean %>% 
@@ -129,9 +132,8 @@ ggp_snowfall =
   geom_boxplot(fill = "lightblue") +
   labs(title = "Distribution of Snowfall",
        x = "Year",
-       y = "Snowfall (mm)",
-       caption = "Snowfall values greater than 0 and less than 100") +
-  theme(axis.text.x = element_text(size = 6,
+       y = "Snowfall (mm)") +
+  theme(axis.text.x = element_text(size = 8,
                                    angle = 45, 
                                    hjust = 1))
 
