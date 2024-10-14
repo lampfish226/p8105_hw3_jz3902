@@ -254,7 +254,7 @@ mims_df %>%
     x = "Age",
     y = "Total Activity",
     color = "Sex",
-    caption = "The total accelerometer activities over the day across different ages, comparing between genders and education levels.") 
+    caption = "The total accelerometer activities over the day across different ages, genders and education levels.") 
 ```
 
 * Overall trend: with increasing age, total accelerometer activities throughout the day decreases.
@@ -417,7 +417,7 @@ result_citi %>%
     x = "Weekdays",
     y = "Median Ride Duration",
     color = "Month",
-    caption = "The effects of weekdays on median ride duration, comparing between different months and years.") +
+    caption = "The effects of weekdays, months and years on median ride duration.") +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 8,
                                    angle = 45, 
@@ -446,7 +446,7 @@ result_citi %>%
     x = "Membership Status",
     y = "Ride Duration",
     fill = "Bike Type",
-    caption = "In 2024, the impact of membership status on the distribution of ride duration, comparing between month and bike type.")
+    caption = "In 2024, the impact of membership status, month and bike type on the distribution of ride duration.")
 ```
 
 * People ride for different lengths of time. In every combination of month, membership status and bike type, there are many outliers for longer rides. 75% of riders ride for 30 minutes or less, but a small number of people ride for longer, even 200+ minutes.
