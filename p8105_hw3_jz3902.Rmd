@@ -298,3 +298,162 @@ mims_df %>%
 
 ## Problem 3
 
+### Organizing dataset
+
+```{r tidy_citi}
+jan_2020_citi = 
+  read_csv("HW3_data/Jan 2020 Citi.csv") %>% 
+  mutate(
+    year = "2020",
+    month = "January"
+  ) %>% 
+  relocate(ride_id, year, month)
+
+jul_2020_citi = 
+  read_csv("HW3_data/July 2020 Citi.csv") %>% 
+  mutate(
+    year = "2020",
+    month = "July"
+  ) %>% 
+  relocate(ride_id, year, month)
+
+jan_2024_citi = 
+  read_csv("HW3_data/Jan 2024 Citi.csv") %>% 
+  mutate(
+    year = "2024",
+    month = "January"
+  ) %>% 
+  relocate(ride_id, year, month)
+
+jul_2024_citi = 
+  read_csv("HW3_data/July 2024 Citi.csv") %>% 
+  mutate(
+    year = "2024",
+    month = "July"
+  ) %>% 
+  relocate(ride_id, year, month)
+
+result_citi = 
+  jan_2020_citi %>% 
+  bind_rows(jul_2020_citi) %>% 
+  bind_rows(jan_2024_citi) %>% 
+  bind_rows(jul_2024_citi) %>% 
+  mutate(
+    weekdays = factor(weekdays,
+                      levels = c("Monday", "Tuesday", "Wednesday",
+                      "Thursday", "Friday", "Saturday", "Sunday")
+                      )
+  )
+```
+
+a) Steps
+
+* Create new variables `year` and `month` for recognition, preparing for dataset combining
+
+* Combine datasets one by one
+
+* Convert `weekdays` variable from character to factor for further plotting
+
+
+```{r}
+result_citi
+```
+
+
+b) Description
+
+* The resulting dataset contains `r nrow(result_citi)` rows and `r ncol(result_citi)` columns.
+
+* Variables include ride id, year, month, bike type, day of the week, ride duration, name of start station, name of end station and membership status.
+
+
+### Total number of rides
+
+```{r total_ride}
+result_citi %>% 
+  group_by(year, month, member_casual) %>% 
+  summarize(n_obs = n()) %>% 
+  pivot_wider(
+    names_from = member_casual,
+    values_from = n_obs
+  ) %>% 
+  knitr::kable()
+```
+
+* For each combination of year and month, members ride more than casual riders.
+
+* There are more rides in July than in January in the same year; the total number of rides in 2024 is more than 2020.
+
+
+### Popular starting stations for July 2024
+
+```{r popular_starting_station}
+result_citi %>% 
+  filter(year == "2024",
+         month == "July") %>% 
+  group_by(start_station_name) %>% 
+  summarize(n_rides = n()) %>% 
+  arrange(desc(n_rides)) %>% 
+  head(n = 5) %>% 
+  knitr::kable()
+```
+
+
+### Median ride duration
+
+```{r median_duration}
+result_citi %>%
+  group_by(weekdays, month, year) %>% 
+  summarize(median_duration = median(duration)) %>% 
+  ggplot(aes(x = weekdays, 
+             y = median_duration, 
+             color = month,
+             group = month)) +
+  geom_point() +
+  geom_line() +
+  facet_grid(. ~year) +
+  labs(
+    title = "Median Ride Duration vs Weekdays",
+    x = "Weekdays",
+    y = "Median Ride Duration",
+    color = "Month",
+    caption = "The effects of weekdays on median ride duration, comparing between different months and years.") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 8,
+                                   angle = 45, 
+                                   hjust = 1))
+```
+
+* Comparison of day of the week: median ride duration remains relatively stable during the weekdays. From Friday to Saturday, ride duration increases.
+
+* Comparison of month: median ride duration in July is significantly higher than January. In 2020, the difference between the two months is greater.
+
+* Comparison of year: median ride duration in 2020 is higher than 2024.
+
+
+### Ride duration in 2024
+
+```{r duration_2024}
+result_citi %>%
+  filter(year == 2024) %>% 
+  ggplot(aes(x = member_casual, 
+             y = duration, 
+             fill = rideable_type)) +
+  geom_boxplot(alpha = .5) +
+  facet_grid(. ~month) +
+  labs(
+    title = "Ride Duration vs Membership Status (2024)",
+    x = "Membership Status",
+    y = "Ride Duration",
+    fill = "Bike Type",
+    caption = "In 2024, the impact of membership status on the distribution of ride duration, comparing between month and bike type.")
+```
+
+* People ride for different lengths of time. In every combination of month, membership status and bike type, there are many outliers for longer rides. 75% of riders ride for 30 minutes or less, but a small number of people ride for longer, even 200+ minutes.
+
+* Comparison of day of membership status: casual riders generally ride longer than members.
+
+* Comparison of bike type: casual riders spend more time on classic bikes; members spend similar amounts of time riding classic and electric bikes. There are more outliers among electric bikes. Considering that electric bikes are more convenient and less strenuous than classic bikes, it is understandable that a small number of people would ride for an unusually long time.
+
+* Comparison of month: ride duration in July is slightly longer than that in January.
+
