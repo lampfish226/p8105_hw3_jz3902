@@ -275,15 +275,17 @@ mims_df %>%
   group_by(seqn, hour, sex, education) %>% 
   summarize(hour_activ = sum(mims)) %>% 
   ggplot(aes(x = hour, y = hour_activ, color = sex)) +
-  geom_point(alpha = .5) +
+  geom_line(aes(group = seqn), alpha = .4) +
   facet_grid(. ~education) +
+  theme_minimal() +
   geom_smooth(se = FALSE) +
   labs(
     title = "24-hour Accelerometer Activity",
     x = "Hour",
     y = "Hour Activity",
     color = "Sex",
-    caption = "The 24-hour accelerometer activities for men and women in each education category.")
+    caption = "The 24-hour accelerometer activities for men and women in each education category.") +
+  viridis::scale_color_viridis(begin = 0.3, end = 0.9, discrete = TRUE)
 ```
 
 * Overall trend: starting from midnight, the accelerometer data is low during the midnight; it starts to rise around 5 am and reaches the maximum value of the day around 10 am; then it starts to decline slowly until it starts to decline rapidly around 8 pm.
@@ -293,6 +295,8 @@ mims_df %>%
 * For "high school equivalent" category, accelerometer activities for male and female are slightly different: the maximum value of the day is slightly larger for female participants.
 
 * For "more than high school" category, female participants’ accelerometer activity remain relatively balanced during the day (rather than gradually decreasing) and has slightly larger values than male participants. Besides, there are a few outliers with extremely high activity values in this category (hour accelerometer activity > 2500), which are not observed in other two categories.
+
+* *Correction after grading: last question of problem 2, use `group=seqn` and `geom_line()` to create lines for each day*
 
 
 ## Problem 3
